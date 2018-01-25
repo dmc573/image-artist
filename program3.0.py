@@ -54,14 +54,27 @@ def make_collages(number_of_images=2, border_shape='rectangle', filter_color='ra
     random.shuffle(image_list)
     
     # Go through the images and save modified versions
+    j = int(math.log(number_of_images, 2))
+    k = number_of_images-2**j
+    image_sublist = []
+    z=0
     for n in range(len(image_list)/number_of_images):
-        curr_images = image_list[n*number_of_images:(n+1)*number_of_images]
-        # Round the corners with default percent of radius
-        for i in range(math.log(number_of_images, 2)):
+        image_sublist.append(image_list[n*number_of_images:(n+1)*number_of_images])
+    for images in image_sublist:
+        z+=1
+        k_images = images[:2*k]
+        curr_images = images[2*k:]
+        for i in range(k):
+            curr_images.append(make_collage(k_images[2*i],k_images[2*i+1],n,new_directory))
+        while len(curr_images)>1:
             comb_images = []
-            for j in range(len(curr_images/2)):
+            for j in range(len(curr_images)/2):
                 comb_images.append(make_collage(curr_images[2*j],curr_images[2*j+1],n,new_directory))
-            
+            curr_images = comb_images
+        print z
+        new_image_filename = os.path.join(new_directory, 'collage' + str(z) + '.png')
+        curr_images[0].save(new_image_filename)
+
 def make_collage(image1, image2, n, new_directory):
     width1, height1 = image1.size
     width2, height2 = image2.size
